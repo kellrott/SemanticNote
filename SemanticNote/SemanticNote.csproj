@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{63FBBC01-2563-4A9E-A2A0-D9B59C4801FC}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>SemanticNote</RootNamespace>
+    <AssemblyName>SemanticNote</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>none</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="mindtouch.dream, Version=2.1.0.20548, Culture=neutral, PublicKeyToken=b17e0197b56911d2">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\mindtouch.dream.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="SgmlReaderDll, Version=1.8.7.14535, Culture=neutral, PublicKeyToken=46b2db9ca481831b">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\SgmlReaderDll.dll</HintPath>
+    </Reference>
+    <Reference Include="mindtouch.deki.ext, Version=10.0.0.20562, Culture=neutral, PublicKeyToken=b17e0197b56911d2">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\mindtouch.deki.ext.dll</HintPath>
+    </Reference>
+    <Reference Include="mindtouch.deki.script, Version=10.0.0.20562, Culture=neutral, PublicKeyToken=b17e0197b56911d2">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\mindtouch.deki.script.dll</HintPath>
+    </Reference>
+    <Reference Include="Autofac, Version=1.4.5.676, Culture=neutral, PublicKeyToken=17863af14b0044da">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Autofac.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Web" />
+    <Reference Include="mindtouch.deki.data, Version=10.0.0.20562, Culture=neutral, PublicKeyToken=b17e0197b56911d2">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\mindtouch.deki.data.dll</HintPath>
+    </Reference>
+    <Reference Include="mindtouch.deki.data.mysql, Version=10.0.0.20562, Culture=neutral, PublicKeyToken=b17e0197b56911d2">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\mindtouch.deki.data.mysql.dll</HintPath>
+    </Reference>
+    <Reference Include="mindtouch.deki.services, Version=10.0.0.20562, Culture=neutral, PublicKeyToken=null">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\mindtouch.deki.services.dll</HintPath>
+    </Reference>
+    <Reference Include="mindtouch.deki.util, Version=10.0.0.20562, Culture=neutral, PublicKeyToken=b17e0197b56911d2">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\mindtouch.deki.util.dll</HintPath>
+    </Reference>
+    <Reference Include="mindtouch.deki, Version=10.0.0.20562, Culture=neutral, PublicKeyToken=b17e0197b56911d2">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\mindtouch.deki.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Note.cs" />
+    <Compile Include="RDFa2RDF.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <Deployment.LinuxDeployData scriptName="sparqltest" />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
+</Project>
