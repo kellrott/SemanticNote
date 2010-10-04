@@ -150,6 +150,14 @@ note.query : Make a sparql query to the backend semantic database
 
 note.endpoint : Get the URL for the SPARQL endpoint proxy.
 
+
+============
+Sample Dekiscript note.link call
+============
+
+{{note.link( 'classifiedWith', 'GO:0030246') }}
+
+
 ============
 Sample Dekiscript SPARQL query
 ============
