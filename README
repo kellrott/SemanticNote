@@ -1,7 +1,29 @@
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+http://www.gnu.org/copyleft/gpl.html
+
+
+============
 SemanticNote
+============
 
+A Plugin For Mindtouch platform to enable semantic web notation
+by Kyle Ellrott (kellrott@gmail.com)
 
+============
 BUILD Notes
+============
 
 - Build SemanticNote C# project and copy SemanticNote.dll to the 
 /var/www/dekiwiki/bin/services/ directory.
@@ -10,9 +32,212 @@ SID:'sid://topsan.org/2010/07/extension/note', add configuration
 key 'semantic-config-uri' with URI of configuration XML file.
 
 
+============
+Basic Configuration
+============
 
-Advanced Configuration:
+semantic-config-uri (REQUIRED): The URI to the configuration file
+plug-name (optional): The user name to the account through which the 
+SemanticNote plugin will access the Deki content
+plug-pass (optional) : The password to the Deki account
+sparql-uri (optional) : The URI to the SPARQL endpoint that will be used
+for accessing Semantic Information
 
+
+============
+Configuration File Format
+============
+
+The following samples is taken from www.topsan.org
+Thisconfiguration file adds several namespace base names, including:
+GO, PFAM, UNIPROT, and CORE.
+
+<!-- xmlns entries are used to add to accessable base name spaces -->
+<config 
+xmlns:core="http://purl.uniprot.org/core/" 
+xmlns:TPS="http://topsan.org/purl/"
+xmlns:GO="http://purl.uniprot.org/go/" 
+xmlns:PFAM="http://purl.uniprot.org/pfam/" 
+xmlns:UNIPROT="http://purl.uniprot.org/uniprot/" 
+xmlns:owl="http://www.w3.org/2002/07/owl#" 
+xmlns:xs="http://www.w3.org/2001/XMLSchema#"
+xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+xmlns:mind="http://mindtouch.com/schema#"
+>
+
+<!-- user arguments to note.link are automatically defined in the 
+defaultPredicateNS namespace -->
+	<defaultPredicateNS>core</defaultPredicateNS>
+
+<!-- pageAlias defines how Deki Page IDs will be formatted to produce 
+aliases -->
+	<pageAlias>TPS{0}</pageAlias>
+
+<!-- The defaultSubjectNS is used to define the default subject of 
+note.link calls. This is combined with the pageAlias to produce the full
+subject URI. So for deki pageID=47 the default subject would be 
+http://topsan.org/purl/TPS47 -->
+	<defaultSubjectNS>TPS</defaultSubjectNS>
+
+<!-- The default subject of a page will be linked it's alias by this 
+predicate -->
+	<aliasPredicate>core:alias</aliasPredicate>
+
+<!-- altNS namespaces will override the default default predicate. So 
+for the following example, the note.link predicate call for 'sameAs' 
+will go to the owl namespace, rather then the default core namespace -->
+	<altNS>
+		<sameAs>owl</sameAs>
+	</altNS>
+
+
+<!-- clickMap maps the displayed hyperlink to a URL different then the 
+one listed in the semantic notation -->
+	<clickMap ns="PFAM">http://pfam.janelia.org/family?acc=</clickMap>
+
+
+<!-- importMap defines an import mapping that allows for users to 
+request additional data to be imported into the semantic database.
+The example below enabled calls like note.import( "UNIPROT:P04637" )
+-->
+	<importMap>
+		<UNIPROT>
+			<source>
+				<graph>http://purl.uniprot.org/uniprot/{0}</graph>
+				<url>http://www.uniprot.org/uniprot/{0}.rdf</url>
+			</source>
+		</UNIPROT>
+	</importMap>
+
+
+
+
+============
+SemanticNote Dekiscript Usage
+============
+
+note.this : Get the default subject for the current page.
+
+note.link : Create a link with embedded semantic information
+ - string rel : The predicate of the relationship
+ - string value : The value of the object (either link or data value)
+ - bool visible : Set to false if link should be invisible
+ - string about : Optional definition of link subject 
+   (by default note.this())
+ - bool rev : set to true if the relationship should be reversed 
+	                    
+
+note.idea : Create complex idea by unwrapping dekiscript data 
+ - hashtable value : the hash table to unwrap
+ - string about : Optional definition of link subject 
+   (by default note.this())
+ - bool visible : Set to true if text should be visible	                
+
+
+note.import : Request data to be imported into Semantic Database
+ - string request : CURIE of requested data
+
+
+note.lookup : Change CURIE or URI to full URI
+ - string curie : Input CURIE
+ 
+ 
+note.lookupClick : Change CURIE or URI to clickable URL
+ - string curie : Input CURIE
+
+note.query : Make a sparql query to the backend semantic database
+  - string queryStr : The sparql query to be run against the database
+
+note.endpoint : Get the URL for the SPARQL endpoint proxy.
+
+============
+Sample Dekiscript SPARQL query
+============
+
+{{var queryStr="PREFIX core:&lt;http://purl.uniprot.org/core/&gt; PREFIX mind:&lt;http://mindtouch.com/schema#&gt; SELECT * WHERE { ?prot a core:Protein . ?prot mind:pageID ?page_id } LIMIT 10";}}</p>
+<table>
+	<tbody>
+		<tr>
+			<td>Page URI</td>
+			<td>Page Deki ID</td>
+		</tr>
+		<tr foreach="var tag in note.query(queryStr)">
+			<td>{{tag['prot']}}</td>
+			<td>{{tag['page_id']}}</td>
+		</tr>
+	</tbody>
+</table>
+
+
+============
+Sample Deki/Ajax SPARQL query
+============
+<input id="endpoint" type="hidden" value="{{note.endpoint();}}" />
+<input id="subject" type="hidden" value="{{note.this();}}" />
+<pre class="script-jem">
+var endpoint = $("#endpoint").val();
+var subject  = $("#subject").val();
+
+function tableRender() {
+   var queryStr = "SELECT * FROM &lt;" + subject + ".extras&gt; WHERE { 
+?s ?p ?o }";
+   $.get( endpoint, { "output":"json", "query" : queryStr },
+     function(json) {
+       $("#dstTable").empty();
+       for (var y in json.results.bindings) {
+         var url = json.results.bindings[y]['s']['value'];
+         var obj = json.results.bindings[y]['o']['value'];
+         $("#dstTable").append( url + " " + obj + "&lt;br/&gt;" );
+        }
+      }
+     );
+}
+
+function titleInput() {
+   var newTitle = $("#title_text").val();
+   var queryStr = "INSERT INTO &lt;" + subject + ".extras&gt; { &lt;" + 
+subject + "&gt; &lt;http://purl.uniprot.org/core/title&gt; '" + newTitle 
++ "' } ";
+
+   $("#dstTable").empty();
+   $.get( endpoint, { "output":"json", "query" : queryStr },
+     function(json) {
+       //$("#dstTable").append( json );
+       tableRender();
+     }
+   );
+}
+
+jQuery().ready( tableRender );
+
+</pre>
+<p><span id="dstTable">&nbsp;</span></p>
+<p><input id="title_text" type="text" /><input onclick="titleInput();" 
+type="button" value="Search" /></p>
+
+
+============
+Semantic Note Services
+============
+
+RDFa : This provides a lightweight pure XML version of the page, 
+To get the RDFa version of pageID=47
+/@api/deki/site/services/=note/proxy/rdfa?id=47
+
+RDF : This provides a pure RDF version of the semantic information 
+embedded in the page
+To get the RDFa version of pageID=47
+/@api/deki/site/services/=note/proxy/rdf?id=47
+
+Sparql Proxy : A proxy to the configured SPARQL endpoint, primarly used 
+as a access point for AJAX based queries.
+/@api/deki/site/services/=note/proxy/sparql
+
+
+
+============
+Advanced Configuration
+============
 
 Working with Virtuoso Authenticated sparql interface:
 - Adjust the sparql configurations as well.  For the authenticated 
