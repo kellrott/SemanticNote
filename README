@@ -155,8 +155,17 @@ note.endpoint : Get the URL for the SPARQL endpoint proxy.
 Sample Dekiscript note.link call
 ============
 
+When called from the Deki page 47:
 {{note.link( 'classifiedWith', 'GO:0030246') }}
 
+Produces the HTML:
+<span about="http://topsan.org/purl/TPS47" 
+rel="http://purl.uniprot.org/core/classifiedWith" 
+href="http://purl.uniprot.org/go/0030246">
+<a rel="external nofollow" 
+href="http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0030246" 
+title="http://amigo.geneontology.org/cgi-bin/amigo/term-details.cgi?term=GO:0030246" 
+target="_blank" class=" external">GO:0030246</a></span>
 
 ============
 Sample Dekiscript SPARQL query
