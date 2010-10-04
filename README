@@ -1,0 +1,26 @@
+SemanticNote
+
+
+BUILD Notes
+
+- Build SemanticNote C# project and copy SemanticNote.dll to the 
+/var/www/dekiwiki/bin/services/ directory.
+- Restart dekiwiki and configure new extention with 
+SID:'sid://topsan.org/2010/07/extension/note', add configuration 
+key 'semantic-config-uri' with URI of configuration XML file.
+
+
+
+Advanced Configuration:
+
+
+Working with Virtuoso Authenticated sparql interface:
+- Adjust the sparql configurations as well.  For the authenticated 
+virtuoso server add 
+‘sparql-name’ (virtuoso user name) 
+and 
+‘sparql-pass’ (virtuoso password)
+
+Note: deki plug interface only supports ‘BASIC’ authentication 
+(not ‘DIGEST’, so the security on the authenitcated sparql page will 
+need to be down graded, see Virtuoso Installation instructions)
