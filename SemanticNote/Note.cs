@@ -109,7 +109,7 @@ namespace MindTouch.Deki.Services.Extension {
 		 * addRelData is an internal function that takes XDoc nodes and adds appropriate 
 		 * 'rel', 'property', 'contents', 'datatype', and 'href' parameters to the node 
 		 */
-		private XDoc addRelData( XDoc node, string predicate, string value, bool ?rev, bool ?visible ) {			
+		private XDoc addRelData( XDoc node, string predicate, string value, string title, bool ?rev, bool ?visible ) {			
 			string relUrl = userConfig.nsExpand( userConfig.defaultPredicateNS) + predicate;
 			if ( userConfig.altDict.ContainsKey( predicate ) ) {
 				relUrl = userConfig.nsExpand( userConfig.altDict[ predicate ] ) + predicate;	
@@ -128,6 +128,16 @@ namespace MindTouch.Deki.Services.Extension {
 					clickURL = "#" + valList[1];
 				} else if ( userConfig.nsDict.ContainsKey( valList[0].ToUpper() ) ) {
 					valueURL = userConfig.nsDict[ valList[0].ToUpper() ] + valList[1];
+					if ( userConfig.formatDict.ContainsKey( valList[0].ToUpper() ) ) {
+						switch ( userConfig.formatDict[ valList[0].ToUpper() ] ) {
+						case "toupper":
+							valueURL = userConfig.nsDict[ valList[0].ToUpper() ] + valList[1].ToUpper();
+							break;
+						case "tolower":
+							valueURL = userConfig.nsDict[ valList[0].ToUpper() ] + valList[1].ToLower();
+							break;
+						}
+					}
 					if ( userConfig.clickDict.ContainsKey( valList[0].ToUpper() ) ) {
 						clickURL = userConfig.clickDict[ valList[0].ToUpper() ] + valList[1];
 					} else {
@@ -156,7 +166,11 @@ namespace MindTouch.Deki.Services.Extension {
 				}
 			}
 			if ( visible == null || visible == true ) {
-				span.Value( value );
+				if ( title == null ) 
+					span.Value( value );
+				else
+					span.Value( title );
+
 			}
 			return span.End();
 		}
@@ -192,6 +206,7 @@ namespace MindTouch.Deki.Services.Extension {
 						[DekiExtParam("rel")] string rel,
 	        			[DekiExtParam("value")] string value,
 	                    [DekiExtParam("visible", true)] bool ?visible,
+                        [DekiExtParam("title", true)] string title,
 	                    [DekiExtParam("about", true)] string about,
 	                    [DekiExtParam("rev", true)] bool ?rev	                    
 	                    )
@@ -204,7 +219,7 @@ namespace MindTouch.Deki.Services.Extension {
 			} else {
 				aboutURL = lookup(about);
 			}
-			addRelData( body.Start( "span" ).Attr("about", aboutURL), rel, value, rev, visible );
+			addRelData( body.Start( "span" ).Attr("about", aboutURL), rel, value, title, rev, visible );
 			return outVar;
 		}
 	
@@ -228,7 +243,7 @@ namespace MindTouch.Deki.Services.Extension {
 			if ( visible == null )
 				visible = false;
 			if ( value is string ) {
-				addRelData( inNode.Start("div").Attr("class", "ideaField"), rel, (string)value, false, visible );
+				addRelData( inNode.Start("div").Attr("class", "ideaField"), rel, (string)value, null, false, visible );
 			}
 			if ( value is Hashtable ) {
 				string blankNode = blankSubject();
@@ -784,11 +799,12 @@ namespace MindTouch.Deki.Services.Extension {
 	{		
 		public Dictionary<string, string> nsDict;	
 		public Dictionary<string, string> clickDict;
+		public Dictionary<string, string> formatDict;
 		public Dictionary<string, string> altDict;
 		public Dictionary<string, string> dataDict;
 		public Dictionary<string, string> labelDict;
 		public Dictionary<string, List<ImportMapping> > importMap;
-
+		
 		
 		public class ImportMapping {
 			public string sourceURI, xsltURI, graphURI;		
@@ -823,6 +839,7 @@ namespace MindTouch.Deki.Services.Extension {
 
 			nsDict = new Dictionary<string, string>();
 			clickDict = new Dictionary<string, string>();
+			formatDict = new Dictionary<string, string>();
 			altDict = new Dictionary<string, string>();
 			dataDict = new Dictionary<string, string>();
 			labelDict = new Dictionary<string, string>();
@@ -865,6 +882,9 @@ namespace MindTouch.Deki.Services.Extension {
 				case "importMap":
 					parseImportMap( a );
 					break;
+				case "format":
+					parseFormat( a );
+					break;
 				}
 			}			
 		}
@@ -887,6 +907,12 @@ namespace MindTouch.Deki.Services.Extension {
 			clickDict.Add( ns.ToUpper(), clickLink );
 		}
 
+		private void parseFormat( XmlNode node ) {
+			string format = node.InnerText;
+			string ns = node.Attributes["ns"].Value;
+			formatDict.Add(  ns.ToUpper(), format );
+		}
+		
 		private void parseAltNS( XmlNode node ) {
 			foreach ( XmlNode a in node.ChildNodes ) {				
 				altDict.Add( a.Name, a.InnerText );
